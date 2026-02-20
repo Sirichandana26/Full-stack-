@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Complaint API</title>
+</head>
+<body>
+  <h2>Submit Test Complaint</h2>
+
+  <button onclick="sendComplaint()">Send Complaint</button>
+
+  <script>
+    function sendComplaint() {
+      fetch("http://localhost:3000/complaint", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          user_id: 1,
+          category: "Street Light Issue",
+          description: "Light not working near park",
+          location: "City Park"
+        })
+      })
+      .then(response => response.text())
+      .then(data => alert(data))
+      .catch(err => alert("Error: " + err));
+    }
+  </script>
+</body>
+</html>
