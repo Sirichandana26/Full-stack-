@@ -2,20 +2,23 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("./db");
+const path = require("path");
 
-// ✅ CREATE APP FIRST
 const app = express();
 
-// ✅ MIDDLEWARE
 app.use(cors());
 app.use(bodyParser.json());
 
-// ================= TEST ROUTE =================
+// ✅ WEBSITE CONFIGURATION (IMPORTANT)
+app.use(express.static(path.join(__dirname, "public")));
+
+// ✅ ROOT ROUTE (LOAD WEBSITE)
 app.get("/", (req, res) => {
-  res.send("Server is running");
+  res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
-// ================= LOGIN (USER + AUTHORITY) =================
+
+// 🔐 LOGIN API
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
 
@@ -30,7 +33,8 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ================= USER SUBMIT COMPLAINT =================
+
+// 📝 INSERT COMPLAINT
 app.post("/complaint", (req, res) => {
   const { user_id, category, description, location } = req.body;
 
@@ -40,16 +44,17 @@ app.post("/complaint", (req, res) => {
   db.query(sql, [user_id, category, description, location], (err) => {
     if (err) {
       console.error(err);
-      res.status(500).send("Error submitting complaint");
+      res.status(500).send("Error inserting complaint");
     } else {
       res.send("Complaint submitted successfully");
     }
   });
 });
 
-// ================= AUTHORITY VIEW COMPLAINTS =================
+
+// 📥 GET COMPLAINTS
 app.get("/complaints", (req, res) => {
-  const sql = "SELECT * FROM complaints WHERE status != 'Resolved'";
+  const sql = "SELECT * FROM complaints";
 
   db.query(sql, (err, results) => {
     if (err) {
@@ -60,7 +65,8 @@ app.get("/complaints", (req, res) => {
   });
 });
 
-// ================= AUTHORITY RESOLVE COMPLAINT =================
+
+// 🔄 UPDATE STATUS (AUTHORITY)
 app.put("/complaint/:id", (req, res) => {
   const id = req.params.id;
   const { status } = req.body;
@@ -77,8 +83,7 @@ app.put("/complaint/:id", (req, res) => {
   });
 });
 
-// ================= START SERVER =================
+
 app.listen(3000, () => {
-  console.log("MySQL Connected Successfully");
   console.log("Server started on port 3000");
 });

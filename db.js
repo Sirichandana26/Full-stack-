@@ -7,12 +7,12 @@ const db = mysql.createConnection({
   database: "public_maintenance"
 });
 
-db.connect((err) => {
+db.connect(err => {
   if (err) {
-    console.error("Database connection failed:", err);
-    return;
+    console.error(err);
+  } else {
+    console.log("MySQL Connected Successfully");
   }
-  console.log("MySQL Connected Successfully");
 });
 
 module.exports = db;
